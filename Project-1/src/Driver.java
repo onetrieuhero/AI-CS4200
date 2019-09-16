@@ -11,12 +11,15 @@ public class Driver{
     * @returns random board state
     */
     private int[] getRandomBoard(){
+
         Integer list[] = {0,1,2,3,4,5,6,7,8};
         int board[] = new int[9];
+        do{
         Collections.shuffle(Arrays.asList(list));
-        for(int i = 0 ; i < board.length; i++){
-            board[i] = list[i];
-        }
+            for (int i = 0; i < board.length; i++) {
+                board[i] = list[i];
+            }
+        } while(this.checkValidity(board) == false);
         return board;
     }
 
@@ -38,7 +41,7 @@ public class Driver{
             for (int i = 0; i < token.length; i++) {
                 board[i] = Integer.parseInt(token[i]);
             }
-            if(!this.checkValidity(board)){
+            if(this.checkValidity(board) == false){
                 System.out.println("The Puzzle Is Not Valid!");
                 System.exit(0);
             }
@@ -90,7 +93,7 @@ public class Driver{
         Scanner kb = new Scanner(System.in);
 
         System.out.println("1: Generate a randomly 8-puzzle problem");
-        System.out.println("2: Enter a specific 8-puzzle configuration");
+        System.out.println("2: Enter a specific 8-puzzle configuration from 0 to 8");
         try {
             while (choice != 1 && choice != 2) {
                 System.out.print("Choose a Option: ");
@@ -107,25 +110,39 @@ public class Driver{
 
         if(choice == 1){
             int randomBoard[] = this.getRandomBoard();
-            this.printArray(randomBoard);
+            this.printPuzzle(randomBoard);
         }
         else{
             int userBoard[] = this.getUsersInput();
-            this.printArray(userBoard);
+            this.printPuzzle(userBoard);
         }
     }
 
     /**
-     *
      * @param array
      * Goes through an Array and prints out the integers
+     * in a box to help visualize the puzzle
      */
-    private void printArray(int[] array){
-        for(int i : array)
-            System.out.print(i + " ");
-        System.out.println("");
+    private void printPuzzle(int[] board){
+        System.out.println("+-------+");
+        for (int i = 0; i < 3; i++) {
+            System.out.print("| ");
+            for (int j = 0; j < 3; j++) {
+                if (board[3 * i + j] == 0) {
+                    System.out.print("  ");
+                } else {
+                    System.out.print(board[3 * i + j] + " ");
+                }
+            }
+            System.out.println("| ");
+        }
+        System.out.println("+-------+");
     }
 
+    //TODO
+    private void getStats(int n){
+
+    }
 
     public static void main(String[] args){
         Driver driver = new Driver();
