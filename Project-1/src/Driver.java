@@ -68,7 +68,7 @@ public class Driver{
      */
     private boolean checkValidity(int[] board){
         HashMap<Integer,Boolean> map = new HashMap<>();
-
+        int inversions = 0;
         for(int i = 0 ; i < board.length;i++){
             if(board[i] > 8 || board[i] < 0){
                 return false;
@@ -78,9 +78,20 @@ public class Driver{
             }
             else {map.put(board[i],true);}
         }
-        return true;
+
+        for(int i = 0 ; i < 8 ; i++){
+            if(board[i] == 0 || board[i] == 1) {
+				continue;
+			}
+            for(int j = i + 1; j < 9; j++){
+                if((board[i] > board[j]) && (board[j] != 0)){
+                    inversions++;
+                }
+            }
+        }
+        if(inversions % 2 == 0){return true;}
+        else {return false;}
     }
-    // TODO
 
 
     /**
