@@ -31,10 +31,11 @@ public class Node{
     public int heuristices2(){
         int totalDistance = 0;
         for(int i = 0 ; i < this.board.length; i++){
-            //TODO
+            int rowDist = Math.abs(i / 3 - this.board[i] / 3);
+            int colDist = Math.abs(i / 3 - this.board[i] / 3);
+            totalDistance = totalDistance + rowDist + colDist;
         }
-
-        return 1;
+        return totalDistance;
     }
 
     /**
