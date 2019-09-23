@@ -122,10 +122,13 @@ public class Driver{
         if(choice == 1){
             int randomBoard[] = this.getRandomBoard();
             this.printPuzzle(randomBoard);
+            this.getSolution(randomBoard);
         }
         else{
+            System.out.print("Please enter your configuration: ");
             int userBoard[] = this.getUsersInput();
             this.printPuzzle(userBoard);
+            this.getSolution(userBoard);
         }
     }
 
@@ -150,13 +153,48 @@ public class Driver{
         System.out.println("+-------+");
     }
 
-    //TODO
-    private void getStats(int n){
+    /**
+     * This program will display 
+     *                          -nodes generated
+     *                          -cpu time
+     *                          -solution to solving the 8 puzzle
+     * @param board
+     */
+    private void getSolution(int[] board){
+        Node node = new Node(board, 0, null);
+        Astar aStarGraphH1 = new Astar(node, 1);
+        Astar aStarGraphH2 = new Astar(node,2);
+        System.out.println("---------------------Graph Search---------------------");
+        System.out.println("Heruistic 1:");
+        System.out.println("Nodes Created: " + aStarGraphH1.nodesGenerated);
+        System.out.println("Time: " + aStarGraphH1.cpuTime + "ms");
+        System.out.println("Solution:");
+        aStarGraphH1.printPuzzle();
+        System.out.println("------------------------------------------------------");
+        System.out.println("Heruistic 2:");
+        System.out.println("Nodes Created: " + aStarGraphH2.nodesGenerated);
+        System.out.println("Time: " + aStarGraphH2.cpuTime + "ms");
+        System.out.println("Solution:");
+        aStarGraphH2.printPuzzle();
+        System.out.println("------------------------------------------------------");
 
+        /*                              Doesn't Work 
+        AstarTree aStarTreeH1 = new AstarTree(node,1);
+        AstarTree aStarTreeH2 = new AstarTree(node,2);
+        System.out.println("----------------------Tree Search---------------------");
+        System.out.println("Heruistic 1:");
+        System.out.println("Time: " + aStarTreeH1.cpuTime + "ms");
+        System.out.println("Nodes Created: " + aStarTreeH1.nodesGenerated);
+        System.out.println("Solution:");
+        aStarTreeH1.printPuzzle();
+
+        System.out.println("Heruistic 2:");
+        System.out.println("Time: " + aStarTreeH2.cpuTime + "ms");
+        System.out.println("Nodes Created: " + aStarTreeH2.nodesGenerated);
+        System.out.println("Solution:");
+        aStarTreeH2.printPuzzle();
+        System.out.println("------------------------------------------------------");
+        */
     }
 
-    public static void main(String[] args){
-        Driver driver = new Driver();
-        driver.prompt();
-    }
 }
