@@ -45,15 +45,4 @@ public class SimulatedAnnealing{
         totalTime = System.nanoTime() / 1000000 - time;
         return board;
     }
-
-
-    public static void main(String[] args) {
-        Node node = new Node(25);
-        SimulatedAnnealing sim = new SimulatedAnnealing();
-        Node solution = sim.SimulatedAlgo(node);
-        solution.print();
-        System.out.println(solution.cost);
-    }
-
-
 }
