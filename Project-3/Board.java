@@ -10,6 +10,11 @@ public class Board{
     int arrayCounter = 0;
     int totalMoves = 0;
 
+
+    /**
+     * This method creates a board state that is empty except for " - "
+     * @return a new board
+     */
     public String[] createBoard(){
         String createBoard[] = new String[64];
         for(int i = 0 ; i < createBoard.length; i++){
@@ -18,6 +23,10 @@ public class Board{
         return createBoard;
     }
 
+    /**
+     * This method prints out the 1D array in a grid format along with correct formatting 
+     * along with player's moves and their history
+     */
     public void printBoard(){
         int index = 1;
         int counter = 1;
@@ -26,6 +35,7 @@ public class Board{
         char letter = 'A';
 
         for(int i = 0 ; i < board.length; i++){
+            //At index 0 it prints out the numbers from 1 to 8 along with the "Player vs. Opponent"
             if(i == 0){
                 System.out.print("  ");
                 while(index != 9){
@@ -38,7 +48,6 @@ public class Board{
                 System.out.print( "\n" + letter + " " + board[i]);
                 letter++;
             }else{
-                // 7 15 23 31 47 55 63
                 System.out.print(board[i]);
                 if(i == 7 && moveCounter < moveLength){
                     System.out.print("\t" + counter++ + ". " + arrayList.get(moveCounter++) + " ");
@@ -82,6 +91,7 @@ public class Board{
                 }
             }      
         }
+        //This part prints it past the board state
         while(moveCounter < moveLength){
             System.out.print("\t\t\t\t" + counter++ + ". " + arrayList.get(moveCounter++) + " ");
             if(moveCounter < moveLength)
@@ -91,6 +101,9 @@ public class Board{
     }
 
 
+    /**
+     * Get players moves and adds it into the arraylist this also prevents duplicate moves
+     */
     public void returnPlayerMove(){
         String playerMove = "";
         Scanner kb = new Scanner(System.in);
@@ -116,6 +129,9 @@ public class Board{
         this.arrayList.add(playerMove);
     }
 
+    /**
+     * This method determins who starts the Agent or the Opponent
+     */
     public void determineStart(){
         System.out.println("Who Goes First?\nA for Agent\nO for Opponent");
         Scanner kb = new Scanner(System.in);
@@ -131,25 +147,32 @@ public class Board{
         }
     }
 
+    /**
+     * This method sets the players moves and alternates the x and o's 
+     */
     public void setPlayerMove(){
         String token[] = new String[2];
         char moveSymbol;
         int indexForBoard = 0;
 
+        //Depending on totalMoves it is either X or O
         if(totalMoves % 2 == 0){
             moveSymbol = 'X';
         }else{moveSymbol = 'O';}
 
-
+        //Splits the string and stores it into a String[] array
         if(arrayList.size() != 0){
             token = arrayList.get(arrayCounter).split("");
             arrayCounter++;
         }
+
+        //Capitalizes the letters of the array
         for(int i = 0 ; i < token.length; i++){
             if(Character.isLetter(token[i].charAt(0))){
                 token[i] = token[i].toUpperCase();
             }
 
+            //Depending on the Letter it adds to the index for the boards so that X or O can be applied
             switch(token[i]){
                 case "A": indexForBoard += 0;
                           break;
@@ -185,17 +208,79 @@ public class Board{
                           break;
             }
     }
+    //Saves X or O to the board 
     board[indexForBoard] = " " + moveSymbol + " ";
     this.printBoard();
     totalMoves++;
     }
 
+    public boolean winByRow(String[] board){
+        boolean status = false;
+        String xValue = " X ";
+        String oValue = " O ";
+
+        for(int i = 0; i < board.length; i+=8){
+            if(i % 8 == 0){
+                if(board[i].equals(xValue) &&
+                   board[i+1].equals(xValue) &&
+                   board[i+2].equals(xValue) &&
+                   board[i+3].equals(xValue)){
+                        status = true;
+                        return status;
+                }
+                if(board[i].equals(oValue) &&
+                   board[i+1].equals(oValue) &&
+                   board[i+2].equals(oValue) &&
+                   board[i+3].equals(oValue)){
+                        status = true;
+                        return status;
+                }
+            }
+            for(int j = i; j < 6; j++){
+                if(board[j].equals(xValue) &&
+                board[j+1].equals(xValue) &&
+                board[j+2].equals(xValue) &&
+                board[j+3].equals(xValue)){
+                    status = true;
+                    return status;
+                }
+                if(board[j].equals(oValue) &&
+                board[j+1].equals(oValue) &&
+                board[j+2].equals(oValue) &&
+                board[j+3].equals(oValue)){
+                    status = true;
+                    return status;
+                }
+            }
+        }
+        return status;
+    }
+
+    public boolean winByCol(String[] board){
+        boolean status = false;
+
+
+
+        return status;
+    }
+
+    public boolean win(String[] board){
+        return winByRow(board);
+    }
+
+    public void endGameAfterWin(boolean winCondition){
+        if(winCondition == true){
+            
+        }
+    }
 
     public static void main(String[] args){
         Board board = new Board();
+        board.printBoard();
         while(true){
         board.returnPlayerMove();
         board.setPlayerMove();
+        System.out.println(board.win(board.board));
         }
     }
 }
