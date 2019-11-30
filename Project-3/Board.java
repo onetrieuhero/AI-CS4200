@@ -12,7 +12,7 @@ public class Board{
     int arrayCounter = 0;
     int totalMoves = 0;
     int timeInSec = 0;
-    int heuristicValue = 0;
+    int heuristicValue;
 
 
     public Board(){
@@ -31,7 +31,7 @@ public class Board{
         parentBoard = board;
     }
     
-
+    
 
     /**
      * This method creates a board state that is empty except for " - "
