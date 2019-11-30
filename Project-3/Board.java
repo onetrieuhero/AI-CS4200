@@ -3,12 +3,34 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Board{
-    String board[] = createBoard();
+    Board parentBoard;
+    String board[];
+    String lastMove;
     ArrayList<String> arrayList = new ArrayList<>();
     HashMap<String, Boolean> map = new HashMap<>();
-    boolean playerStarts;
+    boolean agentStarts;
     int arrayCounter = 0;
     int totalMoves = 0;
+    int timeInSec = 0;
+    int heuristicValue = 0;
+
+
+    public Board(){
+        this.board = createBoard();
+    }
+
+    public Board(String[] board){
+        this.board = board;
+    }
+
+    public Board getparent(){
+        return parentBoard;
+    }
+
+    public void setParent(Board board){
+        parentBoard = board;
+    }
+    
 
 
     /**
@@ -42,7 +64,9 @@ public class Board{
                 System.out.print(" "+ index + " ");
                 index++;
                 }
-                System.out.print("\tPlayer vs. Opponent");
+                if(agentStarts)
+                    System.out.print("\tAgent vs. Opponent");
+                else{System.out.print("\tOpponent vs. Agent");}
             }
             if(i % 8 ==0){
                 System.out.print( "\n" + letter + " " + board[i]);
@@ -97,14 +121,14 @@ public class Board{
             if(moveCounter < moveLength)
                 System.out.println(arrayList.get(moveCounter++));
         }
-        System.out.println();
+        System.out.println("\n");
     }
 
 
     /**
      * Get players moves and adds it into the arraylist this also prevents duplicate moves
      */
-    public void returnPlayerMove(){
+    public String returnPlayerMove(){
         String playerMove = "";
         Scanner kb = new Scanner(System.in);
         boolean continuing = true;
@@ -112,6 +136,11 @@ public class Board{
         //Regex to check if alphanumeric is between a-h or A-H and 1-8
         String n = ".*[1-8].*";
         String a = ".*[a-hA-H].*";
+
+        if(arrayList.size() == 64){
+            System.out.println("DRAW");
+            System.exit(0);
+        }
 
         while(playerMove.length() > 2 || playerMove.length() < 2 ||
                 !playerMove.matches(n) || !playerMove.matches(a)|| continuing == true){
@@ -127,6 +156,7 @@ public class Board{
             }
         }
         this.arrayList.add(playerMove);
+        return playerMove;
     }
 
     /**
@@ -137,33 +167,61 @@ public class Board{
         Scanner kb = new Scanner(System.in);
         String choice = kb.nextLine();
         switch(choice.toUpperCase()){
-            case "A": this.playerStarts = true;
+            case "A": this.agentStarts = true;
                       break;
-            case "X": this.playerStarts = false;
+            case "O": this.agentStarts = false;
                       break;
             default: System.out.println("That isn't a valid choice!");
-                     System.out.println("Ending Program...");
-                     System.exit(0);
+                     determineStart();
         }
     }
+
+
+    // /**
+    //  * This method sets the agents move taking in a string of what the agent is going to do
+    //  * @param move
+    //  */
+    // public void setAgentsMove(String move){
+    //     String agent = "";
+    //     if(arrayList.size() == 64){
+    //         System.out.println("DRAW");
+    //         System.exit(0);
+    //     }
+    //     System.out.println("Agent's move is " + move);
+    //     arrayList.add(move);
+    //     if(agentStarts == true){
+    //         agent = "X";
+    //     }else{
+    //         agent = "O";
+    //     }
+    //     setPlayerMove(move,agent);
+    // }
 
     /**
      * This method sets the players moves and alternates the x and o's 
      */
-    public void setPlayerMove(){
+    public void setPlayerMove(String playerMove, String agent){
         String token[] = new String[2];
-        char moveSymbol;
+        String moveSymbol = "X";
         int indexForBoard = 0;
+        Board newParent = new Board(board.clone());
+        setParent(newParent);
 
-        //Depending on totalMoves it is either X or O
-        if(totalMoves % 2 == 0){
-            moveSymbol = 'X';
-        }else{moveSymbol = 'O';}
+        //Depending on argument it is either X or O
+        if(agent.equals("X")){
+            moveSymbol = "X";
+            lastMove = "X";
+        }else if(
+            agent.equals("O")){
+            moveSymbol = "O";
+            lastMove = "O";
+        }
 
         //Splits the string and stores it into a String[] array
-        if(arrayList.size() != 0){
-            token = arrayList.get(arrayCounter).split("");
-            arrayCounter++;
+        if(/*arrayList.size()*/ playerMove.length() != 0){
+            //token = arrayList.get(arrayCounter).split("");
+            //arrayCounter++;
+            token = playerMove.split("");
         }
 
         //Capitalizes the letters of the array
@@ -210,10 +268,16 @@ public class Board{
     }
     //Saves X or O to the board 
     board[indexForBoard] = " " + moveSymbol + " ";
-    this.printBoard();
+    //this.printBoard();
     totalMoves++;
+
     }
 
+    /**
+     * This method determins if the player or agent won by row
+     * @param board 
+     * @return true if win by row else false
+     */
     public boolean winByRow(String[] board){
         boolean status = false;
         String xValue = " X ";
@@ -256,31 +320,78 @@ public class Board{
         return status;
     }
 
+    /**
+     * This method determines if player or agent wins by col
+     * @param board
+     * @return true if win by col else false
+     */
     public boolean winByCol(String[] board){
         boolean status = false;
+        String xValue = " X ";
+        String oValue = " O ";
 
-
-
+        for(int i = 0 ; i < 40; i++){
+            if(board[i].equals(oValue) &&
+            board[i+8].equals(oValue) &&
+            board[i+16].equals(oValue) &&
+            board[i+24].equals(oValue)){
+                status = true;
+                return status;
+            }
+            if(board[i].equals(xValue) &&
+            board[i+8].equals(xValue) &&
+            board[i+16].equals(xValue) &&
+            board[i+24].equals(xValue)){
+                status = true;
+                return status;
+            }
+        }
         return status;
     }
 
+    /**
+     * This method will end the game if the player has won
+     * @param board
+     * @return
+     */
     public boolean win(String[] board){
-        return winByRow(board);
+        if(winByCol(board) || winByRow(board)){
+            System.out.println("WIN!");
+            System.exit(0);
+        }
+        return winByCol(board) || winByRow(board);
     }
 
-    public void endGameAfterWin(boolean winCondition){
-        if(winCondition == true){
-            
+    public String convertIndexToString(int index){
+        if(index < 8){
+            return "a"+(index+1);
         }
+        if(index >= 8 && index < 16){
+            return "b"+(index%8+1);
+        }
+        if(index >= 16 && index < 24){
+            return "c"+(index%8+1);
+        }
+        if(index >= 24 && index < 32){
+            return "d"+(index%8+1);
+        }
+        if(index >= 32 && index < 40){
+            return "e"+(index%8+1);
+        }
+        if(index >= 40 && index < 48){
+            return "f"+(index%8+1);
+        }
+        if(index >= 48 && index < 56){
+            return "g"+(index%8+1);
+        }
+        if(index >= 56 && index < 64){
+            return "h"+(index%8+1);
+        }else return null;
     }
+
 
     public static void main(String[] args){
         Board board = new Board();
-        board.printBoard();
-        while(true){
-        board.returnPlayerMove();
-        board.setPlayerMove();
-        System.out.println(board.win(board.board));
-        }
+
     }
 }
