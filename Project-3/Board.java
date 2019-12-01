@@ -179,26 +179,6 @@ public class Board implements Comparable<Board>{
     }
 
 
-    // /**
-    //  * This method sets the agents move taking in a string of what the agent is going to do
-    //  * @param move
-    //  */
-    // public void setAgentsMove(String move){
-    //     String agent = "";
-    //     if(arrayList.size() == 64){
-    //         System.out.println("DRAW");
-    //         System.exit(0);
-    //     }
-    //     System.out.println("Agent's move is " + move);
-    //     arrayList.add(move);
-    //     if(agentStarts == true){
-    //         agent = "X";
-    //     }else{
-    //         agent = "O";
-    //     }
-    //     setPlayerMove(move,agent);
-    // }
-
     /**
      * This method sets the players moves and alternates the x and o's 
      */
@@ -220,9 +200,7 @@ public class Board implements Comparable<Board>{
         }
 
         //Splits the string and stores it into a String[] array
-        if(/*arrayList.size()*/ playerMove.length() != 0){
-            //token = arrayList.get(arrayCounter).split("");
-            //arrayCounter++;
+        if( playerMove.length() != 0){
             token = playerMove.split("");
         }
 
@@ -270,7 +248,6 @@ public class Board implements Comparable<Board>{
     }
     //Saves X or O to the board 
     board[indexForBoard] = " " + moveSymbol + " ";
-    //this.printBoard();
     totalMoves++;
 
     }
@@ -364,6 +341,11 @@ public class Board implements Comparable<Board>{
         return winByCol(board) || winByRow(board);
     }
 
+    /**
+     * This method converts the index of the array into the corresponding letter and number
+     * @param index
+     * @return
+     */
     public String convertIndexToString(int index){
         if(index < 8){
             return "a"+(index+1);
@@ -391,11 +373,11 @@ public class Board implements Comparable<Board>{
         }else return null;
     }
 
+    /**
+     * This method is part of the compareable<Board> so
+     * that I can use Collections.sort() to order the highest heuritsitic first
+     */
     public int compareTo(Board board){
         return board.heuristicValue - this.heuristicValue;
-    }
-    public static void main(String[] args){
-        Board board = new Board();
-
     }
 }
