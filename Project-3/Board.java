@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class Board{
+public class Board implements Comparable<Board>{
     Board parentBoard;
     String board[];
     String lastMove;
@@ -31,7 +31,7 @@ public class Board{
         parentBoard = board;
     }
     
-    
+
 
     /**
      * This method creates a board state that is empty except for " - "
@@ -167,9 +167,11 @@ public class Board{
         Scanner kb = new Scanner(System.in);
         String choice = kb.nextLine();
         switch(choice.toUpperCase()){
-            case "A": this.agentStarts = true;
+            case "A": this.lastMove = "O";
+                      this.agentStarts = true;
                       break;
-            case "O": this.agentStarts = false;
+            case "O": this.lastMove = "X";
+                      this.agentStarts = false;
                       break;
             default: System.out.println("That isn't a valid choice!");
                      determineStart();
@@ -389,7 +391,9 @@ public class Board{
         }else return null;
     }
 
-
+    public int compareTo(Board board){
+        return board.heuristicValue - this.heuristicValue;
+    }
     public static void main(String[] args){
         Board board = new Board();
 

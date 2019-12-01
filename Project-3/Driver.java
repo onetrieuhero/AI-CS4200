@@ -2,14 +2,38 @@ import java.util.Scanner;
 
 public class Driver{
     public static void main(String[] args) {
+        Board board = new Board();
+        AlphaBeta ab = new AlphaBeta();
+        String symbol = "X";
         Driver driver = new Driver();
         int maxTime = driver.askForTime();
-        Board board = new Board();
         board.timeInSec = maxTime;
-        boolean aiStarts = board.agentStarts;
-        AlphaBeta ab = new AlphaBeta();
-
-
+        board.determineStart();
+        while(!board.win(board.board)){
+            if(board.agentStarts == true){
+                Board newBoard = ab.AlphaBetaSearch(board);
+                for(int i = 0 ; i < newBoard.board.length; i++){
+                    board.board[i] = newBoard.board[i];
+                }
+                board.printBoard();
+                board.agentStarts = false;
+            }
+            String move = board.returnPlayerMove();
+            if(board.lastMove.equals("X")){
+                symbol = "O";
+                board.lastMove = "O";
+            }else{
+                symbol = "X";
+                board.lastMove = "X";
+        }
+            board.setPlayerMove(move, board.lastMove);
+            board.printBoard();
+            Board newBoard = ab.AlphaBetaSearch(board);
+            for(int i = 0 ; i < newBoard.board.length; i++){
+                board.board[i] = newBoard.board[i];
+            }
+            board.printBoard();
+        }
 
     }
 

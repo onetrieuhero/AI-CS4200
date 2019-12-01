@@ -1,13 +1,14 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AlphaBeta{
-    Board highest;
+    Board best;
     long start = System.currentTimeMillis();
 
     public Board AlphaBetaSearch(Board board){
-
+        start = System.currentTimeMillis();
         int parent = maxValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        return this.highest;
+        return this.best;
     }
 
     private int maxValue(Board board, int alpha, int beta){
@@ -16,13 +17,16 @@ public class AlphaBeta{
         }
         int v = Integer.MIN_VALUE;
         Board arrayBoard[] = successors(board);
+        Board bestBoard = arrayBoard[0];
         for(int i = 0 ; i < arrayBoard.length; i++){
-            v = Math.max(v, minValue(arrayBoard[i],alpha,beta));
+            v = Math.max(v, minValue(bestBoard,alpha,beta));
             if(v >= beta){
+                this.best = bestBoard;
                 return v;
             }
             alpha = Math.max(alpha,v);
         }
+        this.best = bestBoard;
         return v;
     }
 
@@ -33,7 +37,7 @@ public class AlphaBeta{
         int v = Integer.MAX_VALUE;
         Board arrayBoard[] = successors(board);
         for(int i = 0 ; i < arrayBoard.length; i++){
-            v = Math.min(v, maxValue(board, alpha, beta));
+            v = Math.min(v, maxValue(arrayBoard[i], alpha, beta));
             if( v <= alpha){
                 return v;
             }
@@ -42,12 +46,13 @@ public class AlphaBeta{
         return v;
     }
 
+    //Get the successor boards
     private Board[] successors(Board state){
         ArrayList<Board> boardStates = new ArrayList<Board>();
         String agent;
         String empty = " - ";
         String[] board = state.board.clone();
-    
+
         if(state.lastMove.equals("O")){
             agent = "X";
             state.lastMove = agent;
@@ -55,7 +60,6 @@ public class AlphaBeta{
             agent = "O";
             state.lastMove = agent;
         }
-        
         for(int i = 0 ; i < board.length; i++){
             // if(!board[i].equals(empty)){
             //     //Look left
@@ -99,13 +103,105 @@ public class AlphaBeta{
             if(board[i].equals(empty)){
             Board newBoard = new Board(board);
             newBoard.setPlayerMove(newBoard.convertIndexToString(i), agent);
+            newBoard.setParent(state);
+            newBoard.arrayList.add(newBoard.convertIndexToString(i));
             boardStates.add(newBoard);
-            board = state.board.clone();
             board = state.board.clone();
             }
         }
+        for(int i = 0 ; i < boardStates.size(); i++){
+            patternScoring(boardStates.get(i));
+        }
+        Collections.sort(boardStates);
         Board boardArray[] = boardStates.toArray(new Board[boardStates.size()]);
+        boardStates.clear();
         return boardArray;
+    }
+
+    public void patternScoring(Board board){
+        for(int i = 0 ; i < board.board.length; i+=8){
+            for(int j = 0; j < 8; j++){
+                if(!board.board[i+j].equals(" - ")){
+                if(i % 8 != 0 && j < 6){
+                    //Looks for [ ][X][X][ ] and assigns 50
+                    if(board.board[i+j].equals(board.board[i+j+1]) &&
+                       board.board[i+j-1].equals(" - ") && board.board[i+j+2].equals(" - ")){
+                           int value = 50;
+                           if(board.heuristicValue < value){
+                               board.heuristicValue = value;
+                           }
+                       }
+                }
+                if(i % 8 != 0 && j < 5){
+                    // Looks for [ ][X][X][X][ ] three in a row where left and right are empty
+                    if(board.board[i+j].equals(board.board[i+j+1]) && 
+                       board.board[i+j].equals(board.board[i+j+2]) &&
+                       board.board[i+j-1].equals(" - ") && 
+                       board.board[i+j+3].equals(" - ")){
+                           int value = 150;
+                           if(board.heuristicValue < value){
+                               board.heuristicValue = value;
+                           }
+                       }
+                }
+                if(j < 5){
+                    //Looks for [X][X][X][X] and assigns 1000
+                    if(board.board[i+j].equals(board.board[i+j+1])&&
+                    board.board[i+j].equals(board.board[i+j+2])&&
+                    board.board[i+j].equals(board.board[i+j+3])){
+                        int value = 1000;
+                        if(board.heuristicValue < value){
+                            board.heuristicValue = value;
+                        }
+                    }
+                }
+                if(i != 0 && i < 40){
+                    //Looking for [ ]
+                    //            [X]
+                    //            [X]
+                    //            [ ]
+                    if(board.board[i+j].equals(board.board[i+j+8]) &&
+                       board.board[i+j - 8].equals(" - ") &&
+                       board.board[i+j + 16].equals(" - ")){
+                        int value = 50;
+                        if(board.heuristicValue < value){
+                            board.heuristicValue = value;
+                        }
+                    }
+                }
+                if(i != 0 && i < 40){
+                    //Looks for [ ]
+                    //          [X]
+                    //          [X]
+                    //          [X]
+                    //          [ ]
+                    if(board.board[i+j].equals(board.board[i+j+8])&&
+                       board.board[i+j].equals(board.board[i+j+16]) &&
+                       board.board[i+j-8].equals(" - ") &&
+                       board.board[i+j+24].equals(" - ")){
+                        int value = 150;
+                        if(board.heuristicValue < value){
+                            board.heuristicValue = value;
+                        }
+                    }
+                }
+                if(i < 40){
+                    //Looks for [X]
+                    //          [X]
+                    //          [X]
+                    //          [X]
+                    if(board.board[i+j].equals(board.board[i+j+8]) &&
+                    board.board[i+j].equals(board.board[i+j+16]) &&
+                    board.board[i+j].equals(board.board[i+j+24])){
+                        int value = 1000;
+                        if(board.heuristicValue < value){
+                            board.heuristicValue = value;
+                        }
+                    }
+                }
+            }
+        }
+        }
     }
     
 
@@ -121,16 +217,26 @@ public class AlphaBeta{
     public static void main(String[] args) {
         Board board = new Board();
         AlphaBeta ab = new AlphaBeta();
+        String symbol = "X";
+        Driver driver = new Driver();
+        int maxTime = driver.askForTime();
+        board.timeInSec = maxTime;
+        board.determineStart();
+        while(!board.win(board.board)){
         String move = board.returnPlayerMove();
-        board.setPlayerMove(move, "X");
-        board.printBoard();
-        Board array[] = ab.successors(board);
-        // Board array1[] = ab.successors(array[0]);
-        // Board array2[] = ab.successors(array1[0]);
-        for(int i = 0 ; i < array.length;i++){
-            array[i].printBoard();
+        if(board.lastMove.equals("X")){
+            symbol = "O";
+            board.lastMove = "O";
+        }else{
+            symbol = "X";
+            board.lastMove = "X";
         }
-        System.out.println(array.length);
-
+        board.setPlayerMove(move, board.lastMove);
+        Board newBoard = ab.AlphaBetaSearch(board);
+        for(int i = 0 ; i < newBoard.board.length; i++){
+            board.board[i] = newBoard.board[i];
+        }
+        board.printBoard();
+    }
     }
 }
